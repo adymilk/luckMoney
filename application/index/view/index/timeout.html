@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>AngularJS之定时器（timeout）</title>
+		<script src="js/angular.min.js"></script>
+		<script>
+			var app = angular.module("timeApp",[]);
+			app.controller("timeController",function($scope,$timeout){
+				$scope.information = 111;
+				$timeout(function(){
+					$scope.information = 222;
+				},2000);
+			});
+		</script>
+	</head>
+	<body>
+		<div ng-app="timeApp" ng-controller="timeController">
+			<label>{{information}}</label>
+		</div>
+	</body>
+</html>
