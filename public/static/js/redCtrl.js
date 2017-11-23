@@ -9,6 +9,6 @@ app.controller("redCtrl",function($scope,$timeout){
 	    $scope.appearClass = false;
 	    $scope.isafter=true;
 	    $scope.mask = false;
-	},3000);
+	},2000);
 	}
 });

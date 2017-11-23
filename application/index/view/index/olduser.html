@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-    <title>盛腾家装送红包啦</title>
+    <title>您已经参与过啦</title>
     <link href="https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="__STATIC__/css/csshake.min.css">
     <link rel="stylesheet" href="__STATIC__/css/style.css">
@@ -19,20 +19,18 @@
 </head>
 <body ng-app="redApp" ng-controller="redCtrl">
 <!-- 红包 -->
-<div class="red" ng-class="{true:'shake shake-slow',false:''}[appearClass]"><!-- shake-chunk -->
+<div class="red" ng-class="{false:'shake shake-slow',false:''}[appearClass]"><!-- shake-chunk -->
     <span ng-class="{open_bef:isbefore,open_aft:isafter}"></span>
-    <button class="redbutton" ng-show="mask" ng-click="open_btn()">拆红包</button>
     <!--判断-->
-    <div class="red-jg" ng-hide="mask">
-        <h1>恭喜您！</h1>
-        <h5>手气不错，获得现金<span style="font-size: 30px;color: #FDC339;">{$luck_money}元</span></h5>
+    <div class="red-jg" ng-show="mask">
+        <h1>参加过活动啦！</h1>
     </div>
 
 </div>
 <!-- End 红包 -->
 <!-- 按钮 -->
-<div class="t-btn" ng-hide="mask">
-    <button id="getMoney_btn" onclick="showForm()">立即领取</button>
+<div class="t-btn" ng-show="mask">
+    <button>亲、一个人只能领取一个红包哦！</button>
 </div>
 <!-- End 按钮 -->
 <div class="event_detail">
@@ -48,62 +46,13 @@
     </ol>
 </div>
 
-<!--隐藏表单-->
-<div class="userForm">
-    <form>
-        <h3 align="center">请填写领奖人信息</h3>
-        <div class="form-group">
-            <input name="name" id="name" type="text" class="form-control"  placeholder="领奖人姓名">
-        </div>
-        <div class="form-group">
-            <input name="tel" id="tel" type="number" class="form-control"  placeholder="领奖人电话">
-        </div>
-        <input type="hidden" name="openid" id="openid" value="{$Think.session.curUser}">
-        <input type="hidden" name="luck_money" id="luck_money" value="{$luck_money}">
 
-        <button type="submit" name="submit" onclick="checkForm()" class="btn btn-large btn-success">确认领奖人信息</button>
-    </form>
-</div>
 
 
 <embed src="__STATIC__/asset/music.mp3" autostart=true loop=true starttime="00:20" width="0" height="0"></embed>
 <script src="__STATIC__/js/redApp.js"></script>
 <script src="__STATIC__/js/redCtrl.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-<script>
-    $('.userForm').css('display','none');
- function showForm() {
-     $('.userForm').css('display','block');
- }
 
-    //TODO:表单验证
-    function checkForm() {
-        if ($('#name').val() === ''){
-            alert('名字不能为空！');
-        }else if ($('#tel').val() === ''){
-            alert('电话不能为空！');
-        }else $.ajax({
-            type: 'POST',
-            url: "{:url('Index/saveUserToDb')}",
-            data: {
-                name: $('#name').val(),
-                tel: $('#tel').val(),
-                luck_money: $('#luck_money').val(),
-                openid: $('#openid').val()
-            },
-            dataType: 'json',
-            success: function (data) {
-                console.log(data.msg);
-                $('.userForm').css('display','none');
-                $('#getMoney_btn').html(data.msg);
-                $('#getMoney_btn').removeAttr('onclick');
-            },
-            error: function (data) {
-                console.log(data.msg);
-            },
-        });
-    }
-
-</script>
 </body>
 </html>
