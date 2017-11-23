@@ -1,10 +1,10 @@
 <?php
 namespace app\index\controller;
+use Home\Controller\Send;
 use think\Loader;
 use think\Controller;
 use think\Db;
 use think\Session;
-use lib\Packet;
 
 class Index extends Controller
 {
@@ -96,12 +96,8 @@ class Index extends Controller
             $data = ['openid'=>$openid,'luck_money'=>$luck_money,'name'=>$name,'tel'=>$tel];
             $rs = Db::table('stjz_user')->insert($data);
             if ($rs !=0){
-                $Packet = new Packet();
-                $res = $Packet ->_route($openid,$luck_money);
-                $return_code = '发放状态：';
-                $return_msg = '返回信息：';
-                echo $return_code.$res['return_code'].'</br>'.$return_msg.$res['return_msg'];
-                var_dump($res);
+                $send = new Send();
+                $send->sendHongBao($openid,$luck_money);
                 return json(['status'=>200,'msg'=>'红包已发送！请到公众号内领取！']);
             }else{
                 return json(['status'=>291,'msg'=>'太多人啦，请稍后再试！']);

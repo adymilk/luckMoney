@@ -145,8 +145,8 @@ return [
         '__IMG__' => '/public/static/',
         '__CSS__' => '/public/static/',
         '__JS__' => '/public/static/',
-        '__STATIC__' => '/luckMoney/public/static/',
-        '__ROOT__' => '/luckMoney/'
+        '__ROOT__' => '/luckMoney/',
+        '__STATIC__' => '/luckMoney/public/static/'
 
     ],
     // 默认跳转页面对应的模板文件

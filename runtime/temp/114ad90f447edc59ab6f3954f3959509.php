@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:71:"/var/www/html/redpack/public/../application/index/view/index/index.html";i:1511355610;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:71:"/var/www/html/redpack/public/../application/index/view/index/index.html";i:1511434472;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-    <title>新年红包</title>
+    <title>盛腾家装送红包啦</title>
     <link href="https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="__STATIC__/css/csshake.min.css">
     <link rel="stylesheet" href="__STATIC__/css/style.css">
@@ -26,14 +26,14 @@
     <!--判断-->
     <div class="red-jg" ng-hide="mask">
         <h1>恭喜您！</h1>
-        <h5>手气不错，获得现金<span style="font-size: 30px;color: #FDC339;"><?php echo $getmoney; ?>元</span></h5>
+        <h5>手气不错，获得现金<span style="font-size: 30px;color: #FDC339;"><?php echo $luck_money; ?>元</span></h5>
     </div>
 
 </div>
 <!-- End 红包 -->
 <!-- 按钮 -->
 <div class="t-btn" ng-hide="mask">
-    <button id="getMoney_btn">立即领取</button>
+    <button id="getMoney_btn" onclick="showForm()">立即领取</button>
 </div>
 <!-- End 按钮 -->
 <div class="event_detail">
@@ -51,19 +51,18 @@
 
 <!--隐藏表单-->
 <div class="userForm">
-    <form action="<?php echo url('Index/saveUserToDb'); ?>" method="post">
+    <form>
+        <h3 align="center">请填写领奖人信息</h3>
         <div class="form-group">
-            <h3 align="center">请填写领奖人信息</h3>
-            <input name="name" type="text" class="form-control"  placeholder="领奖人姓名">
-
+            <input name="name" id="name" type="text" class="form-control"  placeholder="领奖人姓名">
         </div>
         <div class="form-group">
-            <input name="tel" type="number" class="form-control"  placeholder="领奖人电话">
+            <input name="tel" id="tel" type="number" class="form-control"  placeholder="领奖人电话">
         </div>
-        <input type="hidden" name="openid" value="<?php echo \think\Session::get('curUser'); ?>">
-        <input type="hidden" name="luck_money" value="<?php echo $getmoney; ?>">
+        <input type="hidden" name="openid" id="openid" value="<?php echo \think\Session::get('curUser'); ?>">
+        <input type="hidden" name="luck_money" id="luck_money" value="<?php echo $luck_money; ?>">
 
-        <button type="submit" name="submit" class="btn btn-large btn-success">确认领奖人信息</button>
+        <button type="submit" name="submit" onclick="checkForm()" class="btn btn-large btn-success">确认领奖人信息</button>
     </form>
 </div>
 
@@ -74,11 +73,38 @@
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script>
     $('.userForm').css('display','none');
-    $('#getMoney_btn').click(function () {
-        $('.userForm').css('display','block');
-    });
+ function showForm() {
+     $('.userForm').css('display','block');
+ }
 
     //TODO:表单验证
+    function checkForm() {
+        if ($('#name').val() === ''){
+            alert('名字不能为空！');
+        }else if ($('#tel').val() === ''){
+            alert('电话不能为空！');
+        }else $.ajax({
+            type: 'POST',
+            url: "<?php echo url('Index/saveUserToDb'); ?>",
+            data: {
+                name: $('#name').val(),
+                tel: $('#tel').val(),
+                luck_money: $('#luck_money').val(),
+                openid: $('#openid').val()
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.msg);
+                $('.userForm').css('display','none');
+                $('#getMoney_btn').html(data.msg);
+                $('#getMoney_btn').removeAttr('onclick');
+            },
+            error: function (data) {
+                console.log(data.msg);
+            },
+        });
+    }
+
 </script>
 </body>
 </html>
