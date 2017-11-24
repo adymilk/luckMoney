@@ -1,10 +1,15 @@
 <?php
 namespace app\index\controller;
-use Home\Controller\Send;
-use think\Loader;
+use app\index\controller\Send;
 use think\Controller;
 use think\Db;
 use think\Session;
+use lib\CommonUtil;
+use lib\MD5SignUtil;
+use lib\WxHongBaoHelper;
+use lib\Packet;
+use think\Loader;
+use app\common\behavior\CronRun;
 
 class Index extends Controller
 {
@@ -12,10 +17,11 @@ class Index extends Controller
     public function index(){
 
         $curUser = Session::get('curUser');
-        $count  = Db::table('stjz_user')->where('openid',$curUser)->count();
-        if ($count != 0){
+        $list  = Db::table('stjz_user')->where('openid',$curUser)->count();
+        if ($list != 0){
             $this->redirect('Index/oldUser');
         }else{
+
             /*
         $total 红包总额
         $num 发几个
@@ -78,11 +84,11 @@ class Index extends Controller
 //        $curUser = 'wxeae7cae254903553';
         //存储当前用户到session
         Session::set('curUser',$curUser);
-        $count  = Db::table('stjz_user')->where('openid',$curUser)->count();
-       if ($count != 0){
+        $list  = Db::table('stjz_user')->where('openid',$curUser)->count();
+       if ($list != 0){
            $this->redirect('Index/oldUser');
        }else{
-            $this->redirect('Index/index');
+           $this->redirect('Index/index');
        }
 
     }
@@ -96,10 +102,12 @@ class Index extends Controller
             $data = ['openid'=>$openid,'luck_money'=>$luck_money,'name'=>$name,'tel'=>$tel];
             $rs = Db::table('stjz_user')->insert($data);
             if ($rs !=0){
-                $send = new Send();
-                $send->sendHongBao($openid,$luck_money);
+                $Packet = new Packet();
+                $res = $Packet ->_route($openid,$luck_money * 100);
                 return json(['status'=>200,'msg'=>'红包已发送！请到公众号内领取！']);
+                $this->redirect('Index/getMoney');
             }else{
+//                dump($rs);
                 return json(['status'=>291,'msg'=>'太多人啦，请稍后再试！']);
             }
     }
@@ -114,12 +122,19 @@ class Index extends Controller
     }
 
     function test(){
-        Loader::import('lib\pay',EXTEND_PATH);
-        $Packet = new Packet();
-        $res = $Packet ->_route('okxe3wmrVnQYIYJOGC_k3REh7_1U',100);
-        $return_code = '发放状态：';
-        $return_msg = '返回信息：';
-        echo $return_code.$res['return_code'].'</br>'.$return_msg.$res['return_msg'];
-        var_dump($res);
+//        Loader::import('Packet',EXTEND_PATH);
+        $packet = new Packet();
+        $packet->_route('okxe3wmrVnQYIYJOGC_k3REh7_1U',111);
     }
+
+    function sendTest(){
+        $send = new Send();
+        $send->sendHongBao('okxe3wmrVnQYIYJOGC_k3REh7_1U',1);
+    }
+
+    //成功领取红包！
+    function gotMoney(){
+        return $this->fetch();
+    }
+
 }
