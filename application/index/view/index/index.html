@@ -96,7 +96,7 @@
             },
             beforeSend:function()
             { //触发ajax请求开始时执行
-                $('#sendAjaxBtn').text('审核中...');
+                $('#sendAjaxBtn').text('正在把钱塞进红包中，请稍等...');
                 $('#sendAjaxBtn').attr('onclick','javascript:void();');//改变提交按钮上的文字并将按钮设置为不可点击
             },
             success: function (data) {
@@ -107,10 +107,11 @@
             },
             error: function (data) {
                 //TODO: 因成功返回数据，依然执行error。这里暂时直接写死
-                $('#getMoney_btn').html('红包已发送！请到公众号内领取！');
-                $('.userForm').css('display','none');
-                $('#getMoney_btn').removeAttr('onclick');
-                console.log(data);
+//                $('#getMoney_btn').html('红包已发送！请到公众号内领取！');
+//                $('.userForm').css('display','none');
+//                $('#getMoney_btn').removeAttr('onclick');
+                console.log(data.msg);
+                $('#getMoney_btn').html(data.msg);
             },
         });
     }
