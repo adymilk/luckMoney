@@ -1,6 +1,5 @@
 <?php
 namespace app\index\controller;
-use app\index\controller\Send;
 use think\Controller;
 use think\Db;
 use think\Session;
@@ -8,20 +7,17 @@ use lib\CommonUtil;
 use lib\MD5SignUtil;
 use lib\WxHongBaoHelper;
 use lib\Packet;
-use think\Loader;
-use app\common\behavior\CronRun;
 
 class Index extends Controller
 {
 
     public function index(){
-
+        $list = Db::table('stjz_activity')->select();
         $curUser = Session::get('curUser');
         $list  = Db::table('stjz_user')->where('openid',$curUser)->count();
         if ($list != 0){
             $this->redirect('Index/oldUser');
         }else{
-
             /*
         $total 红包总额
         $num 发几个
@@ -49,13 +45,17 @@ class Index extends Controller
 
             //本次活动参数配置
             $list = Db::table('stjz_activity')->select();
-            $total = $list[0]['total'];
-            $num = $list[0]['num'];
-            $min = $list[0]['min'];
-            $data = get_hongbao($total, $num,$min);
-
-            //取得数组的第一条数据
+            $balance = $list[0]['balance'];//剩余红包金额
+            $remaining_num = $list[0]['remaining_num'];//剩余红包数量
+            $min = $list[0]['min'];//最小红包金额
+            $data = get_hongbao($balance, $remaining_num,$min);
+            //打印所有红包金额
+            //dump($data);
+            //取得随机红包数组的第一条数据
             $luck_money = $data['money'][0];
+            if ($luck_money<=1){
+                $luck_money = 1;
+            }
             $this->assign('luck_money',$luck_money);
 
             return $this->fetch();
@@ -82,18 +82,31 @@ class Index extends Controller
 
         //测试用例， 上线前必须注释这一行！
 //        $curUser = 'wxeae7cae254903553';
-        //存储当前用户到session
-        Session::set('curUser',$curUser);
-        $list  = Db::table('stjz_user')->where('openid',$curUser)->count();
-       if ($list != 0){
-           $this->redirect('Index/oldUser');
-       }else{
-           $this->redirect('Index/index');
-       }
+
+        // 判断账户余额是否为零
+        $list = Db::table('stjz_activity')->where('id',1)->select();
+        $balance = $list[0]['balance'];
+        if ($balance <= 0){
+            $this->redirect('Index/activityIsOver');
+        }else{
+            //存储当前用户到session
+            Session::set('curUser',$curUser);
+            $list  = Db::table('stjz_user')->where('openid',$curUser)->count();
+            if ($list != 0){
+                $this->redirect('Index/oldUser');
+            }else{
+                $this->redirect('Index/index');
+            }
+        }
+
 
     }
 
     //随机红包
+
+    /**
+     * @return \think\response\Json
+     */
     public function saveUserToDb(){
             $name = $_POST['name'];
             $tel = $_POST['tel'];
@@ -101,11 +114,21 @@ class Index extends Controller
             $openid = $_POST['openid'];
             $data = ['openid'=>$openid,'luck_money'=>$luck_money,'name'=>$name,'tel'=>$tel];
             $rs = Db::table('stjz_user')->insert($data);
+
+            //查询本次活动配置表
+
             if ($rs !=0){
                 $Packet = new Packet();
-                $res = $Packet ->_route($openid,$luck_money * 100);
+                $Packet ->_route($openid,$luck_money * 100);
+                $list = Db::table('stjz_activity')->where('id',1)->select();
+                $total = $list[0]['balance'];
+                $remaining_num = $list[0]['remaining_num'];
+                // 剩余红包总额
+                $balance = $total - $luck_money;
+                // 剩余红包数量
+                $remaining_num = $remaining_num - 1;
+                Db::table('stjz_activity')->where('id',1)->update(['balance'=>$balance,'remaining_num'=>$remaining_num]);
                 return json(['status'=>200,'msg'=>'红包已发送！请到公众号内领取！']);
-                $this->redirect('Index/getMoney');
             }else{
 //                dump($rs);
                 return json(['status'=>291,'msg'=>'太多人啦，请稍后再试！']);
@@ -121,19 +144,8 @@ class Index extends Controller
         return $this->fetch();
     }
 
-    function test(){
-//        Loader::import('Packet',EXTEND_PATH);
-        $packet = new Packet();
-        $packet->_route('okxe3wmrVnQYIYJOGC_k3REh7_1U',111);
-    }
-
-    function sendTest(){
-        $send = new Send();
-        $send->sendHongBao('okxe3wmrVnQYIYJOGC_k3REh7_1U',1);
-    }
-
-    //成功领取红包！
-    function gotMoney(){
+    // 账户余额 为0 自动结束活动
+    function activityIsOver(){
         return $this->fetch();
     }
 
