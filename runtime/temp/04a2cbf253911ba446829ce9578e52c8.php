@@ -1,3 +1,4 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:84:"D:\phpStudy\WWW\luckMoney\public/../application/index\view\index\activityisover.html";i:1511596157;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,8 +6,8 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-    <title>盛腾家装送红包啦</title>
-    <link rel="stylesheet" href="__STATIC__/css/bootstrap.min.css">
+    <title>活动结束啦</title>
+    <link href="https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="__STATIC__/css/csshake.min.css">
     <link rel="stylesheet" href="__STATIC__/css/style.css">
 
@@ -18,41 +19,17 @@
     <script src="__STATIC__/js/angular.min.js"></script>
 </head>
 <body ng-app="redApp" ng-controller="redCtrl">
-
-<!--隐藏表单-->
-<div class="userForm" style="display: none">
-    <form>
-        <h3 align="center">请填写领奖人信息</h3>
-        <div class="form-group">
-            <input name="name" id="name" type="text" class="form-control"  placeholder="领奖人姓名">
-        </div>
-        <div class="form-group">
-            <input name="tel" id="tel" type="number" class="form-control"  placeholder="领奖人电话">
-        </div>
-        <input type="hidden" name="openid" id="openid" value="{$Think.session.curUser}">
-        <input type="hidden" name="luck_money" id="luck_money" value="{$luck_money}">
-
-        <button id="sendAjaxBtn" type="submit" name="submit" onclick="checkForm()" class="btn btn-large btn-success">确认领奖人信息</button>
-    </form>
-</div>
-
 <!-- 红包 -->
 <div class="red" ng-class="{true:'shake shake-slow',false:''}[appearClass]"><!-- shake-chunk -->
-    <span ng-class="{open_bef:isbefore,open_aft:isafter}"></span>
-    <button class="redbutton" ng-show="mask" ng-click="open_btn()" onclick="showLuckMoney()">拆红包</button>
+    <span class="open_aft"></span>
     <!--判断-->
-    <div class="red-jg" ng-hide="mask">
-        <h1>恭喜您！</h1>
-        <h5>手气不错，获得现金 <span id="LuckMoney" style="font-size: 30px;color: #FDC339;"></span></h5>
+    <div class="red-jg" ng-show="mask">
+        <h1>来晚啦！</h1>
+        <h5>活动已经结束！</h5>
     </div>
 
 </div>
 <!-- End 红包 -->
-<!-- 按钮 -->
-<div class="t-btn" ng-hide="mask">
-    <button id="getMoney_btn" onclick="showForm()">立即领取</button>
-</div>
-<!-- End 按钮 -->
 <div class="event_detail">
     <h4 style="margin-bottom: 10px;color:dimgrey"> &nbsp;活动详情</h4>
     <hr style="height:1px;border:none;border-top:1px dashed gray;" />
@@ -64,20 +41,15 @@
     </ol>
 </div>
 
-
-
 <script src="__STATIC__/js/redApp.js"></script>
 <script src="__STATIC__/js/redCtrl.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script>
-    //显示表单
- function showForm() {
-     $('.userForm').css('display','block');
- }
- //显示金额
-    function showLuckMoney() {
-        $('#LuckMoney').html('{$luck_money}元');
+    $('.userForm').css('display','none');
+    function showForm() {
+        $('.userForm').css('display','block');
     }
+
     //TODO:表单验证
     function checkForm() {
         if ($('#name').val() === ''){
@@ -86,8 +58,8 @@
             alert('电话不能为空！');
         }else $.ajax({
             type: 'POST',
-            url: "{:url('Index/saveUserToDb')}",
-            dataType: 'text',
+            url: "<?php echo url('Index/saveUserToDb'); ?>",
+            dataType: 'json',
             data: {
                 name: $('#name').val(),
                 tel: $('#tel').val(),
@@ -96,20 +68,21 @@
             },
             beforeSend:function()
             { //触发ajax请求开始时执行
-                $('#sendAjaxBtn').text('正在把钱塞进红包中，请稍等...');
+                $('#sendAjaxBtn').text('审核中...');
                 $('#sendAjaxBtn').attr('onclick','javascript:void();');//改变提交按钮上的文字并将按钮设置为不可点击
             },
             success: function (data) {
-                $('#getMoney_btn').html(data);
+                $('#getMoney_btn').html(data.msg);
+                $('.userForm').css('display','none');
+                $('#getMoney_btn').removeAttr('onclick');
+                console.log(data.msg);
+            },
+            error: function (data) {
+                //TODO: 因成功返回数据，依然执行error。这里暂时直接写死
+                $('#getMoney_btn').html('红包已发送！请到公众号内领取！');
                 $('.userForm').css('display','none');
                 $('#getMoney_btn').removeAttr('onclick');
                 console.log(data);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(XMLHttpRequest.status);
-                console.log(XMLHttpRequest.readyState);
-                console.log(textStatus);
-                $('#getMoney_btn').html(data);
             },
         });
     }

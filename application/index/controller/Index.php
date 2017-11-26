@@ -67,7 +67,6 @@ class Index extends Controller
 
         }else{
             echo '请在微信客户端打开！';
-            return ;
         }
 
 
@@ -80,18 +79,18 @@ class Index extends Controller
          *获取用户openid
          */
 
-//        $appid = "wxeae7cae254903553";
-//        $secret = "895cfcc6ffde96014f12385182fe47e5";
-//
-//        $code = $_GET["code"];
-//        $get_token_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$secret.'&code='.$code.'&grant_type=authorization_code';
-//
-//        $res = file_get_contents($get_token_url);
-//        $res = json_decode($res);
-//        $curUser = $res->openid;
+        $appid = "wxeae7cae254903553";
+        $secret = "895cfcc6ffde96014f12385182fe47e5";
+
+        $code = $_GET["code"];
+        $get_token_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$secret.'&code='.$code.'&grant_type=authorization_code';
+
+        $res = file_get_contents($get_token_url);
+        $res = json_decode($res);
+        $curUser = $res->openid;
 
         //测试用例， 上线前必须注释这一行！
-        $curUser = 'wxeae7cae254903553';
+//        $curUser = 'okxe3wmrVnQYIYJOGC_k3REh7_1U';
 
         // 判断账户余额是否为零
         $list = Db::table('stjz_activity')->where('id',1)->select();
@@ -126,24 +125,26 @@ class Index extends Controller
             $rs = Db::table('stjz_user')->insert($data);
 
             if ($rs !=0){
-//                $Packet = new Packet();
-//                $Packet ->_route($openid,$luck_money * 100);
+                $Packet = new Packet();
+                $wechatRt = $Packet ->_route($openid,$luck_money * 100);
+//                打印微信支付返回结果
+//                dump($wechatRt);
+                //查询本次活动金额数量配置表
+                $list = Db::table('stjz_activity')->where('id',1)->select();
+                $total = $list[0]['balance'];
+                $remaining_num = $list[0]['remaining_num'];
+                // 剩余红包总额
+                $balance = $total - $luck_money;
+                // 剩余红包数量
+                $remaining_num = $remaining_num - 1;
+                Db::table('stjz_activity')->where('id',1)->update(['balance'=>$balance,'remaining_num'=>$remaining_num]);
+                Session::clear('curUser');
+                return json('红包已发送！请到公众号内领取！');
 
-                return json(['status'=>200,'msg'=>'红包已发送！请到公众号内领取！']);
             }else{
 //                dump($rs);
-                return json(['status'=>500,'msg'=>'太多人啦，请稍后再试！']);
+                return json('太多人啦，请稍后再试！');
             }
-            //查询本次活动金额数量配置表
-            $list = Db::table('stjz_activity')->where('id',1)->select();
-            $total = $list[0]['balance'];
-            $remaining_num = $list[0]['remaining_num'];
-            // 剩余红包总额
-            $balance = $total - $luck_money;
-            // 剩余红包数量
-            $remaining_num = $remaining_num - 1;
-            Db::table('stjz_activity')->where('id',1)->update(['balance'=>$balance,'remaining_num'=>$remaining_num]);
-            Session::clear('curUser');
     }
 
     /**

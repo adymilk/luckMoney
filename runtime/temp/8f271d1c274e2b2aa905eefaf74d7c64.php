@@ -1,3 +1,4 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:75:"D:\phpStudy\WWW\luckMoney\public/../application/index\view\index\index.html";i:1511665952;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,8 +30,8 @@
         <div class="form-group">
             <input name="tel" id="tel" type="number" class="form-control"  placeholder="领奖人电话">
         </div>
-        <input type="hidden" name="openid" id="openid" value="{$Think.session.curUser}">
-        <input type="hidden" name="luck_money" id="luck_money" value="{$luck_money}">
+        <input type="hidden" name="openid" id="openid" value="<?php echo \think\Session::get('curUser'); ?>">
+        <input type="hidden" name="luck_money" id="luck_money" value="<?php echo $luck_money; ?>">
 
         <button id="sendAjaxBtn" type="submit" name="submit" onclick="checkForm()" class="btn btn-large btn-success">确认领奖人信息</button>
     </form>
@@ -76,7 +77,7 @@
  }
  //显示金额
     function showLuckMoney() {
-        $('#LuckMoney').html('{$luck_money}元');
+        $('#LuckMoney').html('<?php echo $luck_money; ?>元');
     }
     //TODO:表单验证
     function checkForm() {
@@ -86,7 +87,7 @@
             alert('电话不能为空！');
         }else $.ajax({
             type: 'POST',
-            url: "{:url('Index/saveUserToDb')}",
+            url: "<?php echo url('Index/saveUserToDb'); ?>",
             dataType: 'text',
             data: {
                 name: $('#name').val(),

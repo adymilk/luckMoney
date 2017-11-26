@@ -1,3 +1,4 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:77:"D:\phpStudy\WWW\luckMoney\public/../application/index\view\index\olduser.html";i:1511666079;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>
