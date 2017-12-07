@@ -21,8 +21,8 @@ class Wxapi {
         $wxHongBaoHelper->setParameter("mch_billno", $this->app_mchid.date('YmdHis').rand(1000, 9999));//订单号
         $wxHongBaoHelper->setParameter("mch_id", $this->app_mchid);//商户号
         $wxHongBaoHelper->setParameter("wxappid", $this->app_id);
-        $wxHongBaoHelper->setParameter("nick_name", '盛腾装饰设计有限公司');//提供方名称
-        $wxHongBaoHelper->setParameter("send_name", '盛腾装饰设计有限公司');//红包发送者名称
+        $wxHongBaoHelper->setParameter("nick_name", '盛腾家装工厂店');//提供方名称
+        $wxHongBaoHelper->setParameter("send_name", '盛腾家装工厂店');//红包发送者名称
         $wxHongBaoHelper->setParameter("re_openid", $re_openid);//付款给哪一个用户唯一openid
         $wxHongBaoHelper->setParameter("total_amount", $money);//付款金额，单位分
         $wxHongBaoHelper->setParameter("min_value", $money);//最小红包金额，单位分
@@ -31,7 +31,7 @@ class Wxapi {
         $wxHongBaoHelper->setParameter("wishing",'恭喜发财');//红包祝福诧
         $wxHongBaoHelper->setParameter("client_ip", '211.149.159.75');//调用接口的机器 Ip 地址
         $wxHongBaoHelper->setParameter("act_name", '新年家装铁锤行动');//活动名称
-        $wxHongBaoHelper->setParameter("remark", '活动备注信息！');//备注信息
+        $wxHongBaoHelper->setParameter("remark", '2071新年家装铁锤行动！');//备注信息
         $postXml = $wxHongBaoHelper->create_hongbao_xml();
 
         $url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';
