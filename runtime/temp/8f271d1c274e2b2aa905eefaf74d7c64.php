@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:75:"D:\phpStudy\WWW\luckMoney\public/../application/index\view\index\index.html";i:1511665952;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:75:"D:\phpStudy\WWW\luckMoney\public/../application/index\view\index\index.html";i:1512720976;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>
